@@ -27,15 +27,18 @@ jobs:
       # run shellcheck
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@1.1.0
-      - name: Post comment
-        uses: mshick/add-pr-comment@v1
-        if: ${{ success() }}
-        with:
-            message: |
-             ${{ inputs.message }}
-            repo-token: ${{ secrets.GITHUB_TOKEN }}
-            repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
-            allow-repeats: false # This is the default
+      - name: Install proselint and write-good
+        run: |
+              sudo apt-get update
+              sudo apt-get install -y proselint
+              npm install -g write-good
+      - name: Check Markdown files with proselint
+        run: |
+              find . -name "*.md" -type f -print0 | xargs -0 proselint
+      - name: Check Markdown files with write-good
+        run: |
+              find . -name "*.md" -type f -print0 | xargs -0 write-good
+              allow-repeats: false # This is the default
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
